@@ -1500,10 +1500,10 @@ public class SimonStoresScript : MonoBehaviour
                 x += step[0][0];
                 break;
             case 1:
-                x += (x % 4 * step[1][0]) - step[0][3];
+                x += (((x + 400) % 4) * step[1][0]) - step[0][3];
                 break;
             case 2:
-                x += (x % 3 * step[2][0]) - (step[1][j - 1] % 3 * step[1][0]) + (step[0][j - 1] % 3 * step[0][0]);
+                x += (((x + 600) % 3) * step[2][0]) - (((step[1][j - 1] + 600) % 3) * step[1][0]) + (((step[0][j - 1] + 600) % 3) * step[0][0]);
                 break;
         }
         x = Check(x);
@@ -1842,10 +1842,10 @@ public class SimonStoresScript : MonoBehaviour
                 x -= step[0][0];
                 break;
             case 1:
-                x += (step[1][0] % 4 * x) - step[0][3];
+                x += (((step[1][0] + 400) % 4) * x) - step[0][3];
                 break;
             case 2:
-                x += (step[2][0] % 3 * x) - (step[1][0] % 3 * step[1][j]) + (step[0][0] % 3 * step[0][j]);
+                x += (((step[2][0] + 600) % 3) * x) - (((step[1][0] + 600) % 3) * step[1][j]) + (((step[0][0] + 600) % 3) * step[0][j]);
                 break;
         }
         x = Check(x);
