@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +31,8 @@ public class SimonStoresScript : MonoBehaviour
     private int[][] step = new int[3][] { new int[6], new int[6], new int[6] };
     private const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private List<char> uh = new List<char> { 'R', 'G', 'B', 'C', 'M', 'Y' };
+    private List<string> flashingColours = new List<string> { };
+    private List<string> fc = new List<string> { };
     private char[][] executionOrder = new char[3][] { new char[6] { 'R', 'G', 'B', 'C', 'M', 'Y' }, new char[6] { 'Y', 'B', 'G', 'M', 'C', 'R' }, new char[6] { 'B', 'M', 'R', 'Y', 'G', 'C' } };
     private List<int> selector = new List<int> { 1, 1, 1, 1, 1, 2, 3 };
     private List<int>[] uhh = new List<int>[3] { new List<int> { 0, 1, 2, 3, 4, 5 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 } };
@@ -59,13 +61,12 @@ public class SimonStoresScript : MonoBehaviour
             button.OnInteract += delegate () { ButtonPress(buttonPressed); return false; };
             KMSelectable buttonHL = button;
             button.OnHighlight += delegate () { HLButton(buttonHL); };
+            KMSelectable buttonHLEnd = button;
+            button.OnHighlightEnded += delegate () { HLEndButton(buttonHLEnd); };
         }
         whiteButton.OnInteract += delegate () { WButton(); return false; };
-        whiteButton.OnHighlight += delegate () { HlightOff(); };
         greyButton.OnInteract += delegate () { StartButton(); return false; };
-        greyButton.OnHighlight += delegate () { HlightOff(); };
         blackButton.OnInteract += delegate () { BButton(); return false; };
-        blackButton.OnHighlight += delegate () { HlightOff(); };
     }
 
     void Start()
@@ -285,7 +286,6 @@ public class SimonStoresScript : MonoBehaviour
                 executionOrder[i][tempNum[1]] = 'G';
             }
         }
-        Debug.LogFormat("[Simon Stores #{0}] The button order for stage 1 was {1}", moduleId, new string(executionOrder[0]));
         //Determining sequence of operations and setting up button flashes
         for(int i = 0; i < 3; i++)
         {
@@ -300,7 +300,8 @@ public class SimonStoresScript : MonoBehaviour
                                 step[i][j + 1] = Red(step[i][j], i, j + 1);
                                 if (i == 2)
                                 {
-                                    lightSeq[j][order.IndexOf('R')] = true;     
+                                    lightSeq[j][order.IndexOf('R')] = true;
+                                    flashingColours.Add("R");
                                 }
                                 break;
                             case 1:
@@ -308,6 +309,7 @@ public class SimonStoresScript : MonoBehaviour
                                 if (i == 2)
                                 {
                                     lightSeq[j][order.IndexOf('G')] = true;
+                                    flashingColours.Add("G");
                                 }
                                 break;
                             case 2:
@@ -315,6 +317,7 @@ public class SimonStoresScript : MonoBehaviour
                                 if (i == 2)
                                 {
                                     lightSeq[j][order.IndexOf('B')] = true;
+                                    flashingColours.Add("B");
                                 }
                                 break;
                             case 3:
@@ -322,6 +325,7 @@ public class SimonStoresScript : MonoBehaviour
                                 if (i == 2)
                                 {
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("C");
                                 }
                                 break;
                             case 4:
@@ -329,6 +333,7 @@ public class SimonStoresScript : MonoBehaviour
                                 if (i == 2)
                                 {
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("M");
                                 }
                                 break;
                             case 5:
@@ -336,6 +341,7 @@ public class SimonStoresScript : MonoBehaviour
                                 if (i == 2)
                                 {
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("Y");
                                 }
                                 break;
                         }
@@ -349,6 +355,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('G')] = true;
+                                    flashingColours.Add("RG");
                                 }
                                 break;
                             case 1:
@@ -357,6 +364,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
+                                    flashingColours.Add("RB");
                                 }
                                 break;
                             case 2:
@@ -365,6 +373,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("RC");
                                 }
                                 break;
                             case 3:
@@ -373,6 +382,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("RM");
                                 }
                                 break;
                             case 4:
@@ -381,6 +391,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("RY");
                                 }
                                 break;
                             case 5:
@@ -389,6 +400,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
+                                    flashingColours.Add("GB");
                                 }
                                 break;
                             case 6:
@@ -397,6 +409,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("GC");
                                 }
                                 break;
                             case 7:
@@ -405,6 +418,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("GM");
                                 }
                                 break;
                             case 8:
@@ -413,6 +427,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("GY");
                                 }
                                 break;
                             case 9:
@@ -421,6 +436,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("BC");
                                 }
                                 break;
                             case 10:
@@ -429,6 +445,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("BM");
                                 }
                                 break;
                             case 11:
@@ -437,6 +454,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("BY");
                                 }
                                 break;
                             case 12:
@@ -445,6 +463,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("CM");
                                 }
                                 break;
                             case 13:
@@ -453,6 +472,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("CY");
                                 }
                                 break;
                             case 14:
@@ -461,6 +481,7 @@ public class SimonStoresScript : MonoBehaviour
                                 {
                                     lightSeq[j][order.IndexOf('M')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("MY");
                                 }
                                 break;
                         }
@@ -475,6 +496,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
+                                    flashingColours.Add("RGB");
                                 }
                                 break;
                             case 1:
@@ -484,6 +506,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("RGC");
                                 }
                                 break;
                             case 2:
@@ -493,6 +516,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("RGM");
                                 }
                                 break;
                             case 3:
@@ -502,6 +526,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("RGY");
                                 }
                                 break;
                             case 4:
@@ -511,6 +536,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("RBC");
                                 }
                                 break;
                             case 5:
@@ -520,6 +546,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("RBM");
                                 }
                                 break;
                             case 6:
@@ -529,6 +556,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("RBY");
                                 }
                                 break;
                             case 7:
@@ -538,6 +566,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("RCM");
                                 }
                                 break;
                             case 8:
@@ -547,6 +576,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("RCY");
                                 }
                                 break;
                             case 9:
@@ -556,6 +586,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('R')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("RMY");
                                 }
                                 break;
                             case 10:
@@ -565,6 +596,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
+                                    flashingColours.Add("GBC");
                                 }
                                 break;
                             case 11:
@@ -574,6 +606,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("GBM");
                                 }
                                 break;
                             case 12:
@@ -583,6 +616,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("GBY");
                                 }
                                 break;
                             case 13:
@@ -592,6 +626,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("GCM");
                                 }
                                 break;
                             case 14:
@@ -601,6 +636,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("GCY");
                                 }
                                 break;
                             case 15:
@@ -610,6 +646,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('G')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("GMY");
                                 }
                                 break;
                             case 16:
@@ -619,6 +656,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
+                                    flashingColours.Add("BCM");
                                 }
                                 break;
                             case 17:
@@ -628,6 +666,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("BCY");
                                 }
                                 break;
                             case 18:
@@ -637,6 +676,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('B')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("BMY");
                                 }
                                 break;
                             case 19:
@@ -646,6 +686,7 @@ public class SimonStoresScript : MonoBehaviour
                                     lightSeq[j][order.IndexOf('C')] = true;
                                     lightSeq[j][order.IndexOf('M')] = true;
                                     lightSeq[j][order.IndexOf('Y')] = true;
+                                    flashingColours.Add("CMY");
                                 }
                                 break;
                         }
@@ -683,6 +724,13 @@ public class SimonStoresScript : MonoBehaviour
                 }
             }
         }
+        for (int i = 0; i < 3; i++)
+        {
+            fc.Add(flashingColours[i]);
+        }
+        string[] f = fc.ToArray();
+        Debug.LogFormat("[Simon Stores #{0}] The flashing order for stage 1 was {1}", moduleId, String.Join(", ", f));
+        Debug.LogFormat("[Simon Stores #{0}] The pressing order for stage 1 was {1}", moduleId, new string(executionOrder[0]));
         Debug.LogFormat("[Simon Stores #{0}] {2} in balanced ternary is {1}", moduleId, new string(balancedTrits[0]), step[0][3]);
         Debug.LogFormat("[Simon Stores #{1}] The correct input for stage 1 was {0}", finalAnswer[stage - 1], moduleId);
         tempNum[2] = 0;
@@ -953,6 +1001,7 @@ public class SimonStoresScript : MonoBehaviour
                 if (stage == 2)
                 {
                     Debug.LogFormat("[Simon Stores #{1}] b0 = {0}", step[1][0], moduleId);
+                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[3]);
                     Debug.LogFormat("[Simon Stores #{1}] The button order for stage 2 was {0}", new string(executionOrder[1]), moduleId);
                     for (int i = 1; i < 5; i++)
                     {
@@ -964,6 +1013,7 @@ public class SimonStoresScript : MonoBehaviour
                 else
                 {
                     Debug.LogFormat("[Simon Stores #{1}] c0 = {0}", step[2][0], moduleId);
+                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[4]);
                     Debug.LogFormat("[Simon Stores #{1}] The button order for stage 3 was {0}", new string(executionOrder[2]), moduleId);
                     for (int i = 1; i < 6; i++)
                     {
@@ -1095,7 +1145,7 @@ public class SimonStoresScript : MonoBehaviour
         }
     }
 
-    void HlightOff()
+    void HLEndButton(KMSelectable button)
     {
         screen.GetComponentInChildren<TextMesh>().text = String.Empty;
     }
@@ -1845,7 +1895,7 @@ public class SimonStoresScript : MonoBehaviour
                 x += (((step[1][0] + 400) % 4) * x) - step[0][3];
                 break;
             case 2:
-                x += (((step[2][0] + 600) % 3) * x) - (((step[1][0] + 600) % 3) * step[1][j]) + (((step[0][0] + 600) % 3) * step[0][j]);
+                x += (((step[2][0] + 600) % 3) * x) - (((step[1][0] + 600) % 3) * step[1][j - 1]) + (((step[0][0] + 600) % 3) * step[0][j - 1]);
                 break;
         }
         x = Check(x);
