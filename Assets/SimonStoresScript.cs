@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Text.RegularExpressions;
 using KModkit;
+using UnityEngine;
 
 public class SimonStoresScript : MonoBehaviour
 {
@@ -1926,5 +1927,45 @@ public class SimonStoresScript : MonoBehaviour
             }
         }
         return Y;
+    }
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} AWRKMCA [A = gray, K = black] | !{0} cycle [shows colors of buttons clockwise from white]";
+#pragma warning restore 414
+
+    public IEnumerator ProcessTwitchCommand(string command)
+    {
+        if (Regex.IsMatch(command, @"^\s*cycle\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+    {
+            yield return null;
+            for (int i = 0; i < 6; i++)
+            {
+                buttons[i].OnHighlight();
+                yield return new WaitForSeconds(1.2f);
+                buttons[i].OnHighlightEnded();
+                yield return new WaitForSeconds(.1f);
+            }
+            yield break;
+        }
+
+        var m = Regex.Match(command, @"^\s*([AWKRMGBCY, ]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (!m.Success)
+            yield break;
+
+        yield return null;
+        yield return m.Groups[1].Value
+            .Select(ch =>
+            {
+                if (ch == 'A' || ch == 'a')
+                    return greyButton;
+                if (ch == 'W' || ch == 'w')
+                    return whiteButton;
+                if (ch == 'K' || ch == 'k')
+                    return blackButton;
+                var pos = order.IndexOf(char.ToUpperInvariant(ch));
+                return pos == -1 ? null : buttons[pos];
+            })
+            .Where(btn => btn != null)
+            .ToArray();
     }
 }
