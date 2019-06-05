@@ -1446,7 +1446,7 @@ public class SimonStoresScript : MonoBehaviour
                 x = (4 * D) - Math.Abs(Blue(x, 1, j) - Cyan(x, 1, j));
                 break;
             case 2:
-                x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), -Math.Abs(Green(x, 2, j) - Cyan(x, 2, j)));
+                x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), -Math.Abs(Blue(x, 2, j) - Cyan(x, 2, j)));
                 break;
         }
         x = Check(x);
