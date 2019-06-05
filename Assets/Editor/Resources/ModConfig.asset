@@ -14,9 +14,13 @@ MonoBehaviour:
   id: simonStores
   title: Simon Stores
   author: Speakingevil
-  description: 'Simon Stores ver 1.1.1.1
+  description: 'Simon Stores ver 1.4
 
     Calaculators at the ready...
+
+
+    Calculate a number based on the serial number and flashing colours, and submit
+    it in balanced ternary using the buttons on the module.
 
 
     Module ID: simonStores

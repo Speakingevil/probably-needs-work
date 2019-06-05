@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using KModkit;
+using System.Linq;
 using UnityEngine;
+using KModkit;
 
 public class SimonStoresScript : MonoBehaviour
 {
@@ -1936,7 +1936,7 @@ public class SimonStoresScript : MonoBehaviour
     public IEnumerator ProcessTwitchCommand(string command)
     {
         if (Regex.IsMatch(command, @"^\s*cycle\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-    {
+        {
             yield return null;
             for (int i = 0; i < 6; i++)
             {
@@ -1969,3 +1969,4 @@ public class SimonStoresScript : MonoBehaviour
             .ToArray();
     }
 }
+
