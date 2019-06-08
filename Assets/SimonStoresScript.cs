@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -14,9 +14,11 @@ public class SimonStoresScript : MonoBehaviour
     public KMSelectable whiteButton;
     public KMSelectable greyButton;
     public KMSelectable blackButton;
-    public KMSelectable[] buttons;
+    public List<KMSelectable> buttons = new List<KMSelectable>();
     public GameObject screen;
     public Material[] buttonColour;
+    public Material[] litColour;
+    public Material[] endColour;
     public Renderer[] buttonId;
 
     int D;
@@ -41,6 +43,7 @@ public class SimonStoresScript : MonoBehaviour
     private List<int> subselection1 = new List<int>();
     private List<int> subselection2 = new List<int>();
     private int[] selection = new int[5];
+    private string oh = "RGBCMY";
     private List<char> order = new List<char>();
     private List<string> inputList = new List<string>();
     private char[][] balancedTrits = new char[3][] { new char[6], new char[6], new char[6] };
@@ -66,8 +69,10 @@ public class SimonStoresScript : MonoBehaviour
             button.OnHighlightEnded += delegate () { HLEndButton(buttonHLEnd); };
         }
         whiteButton.OnInteract += delegate () { WButton(); return false; };
+        whiteButton.GetComponent<Renderer>().material = buttonColour[6];
         greyButton.OnInteract += delegate () { StartButton(); return false; };
         blackButton.OnInteract += delegate () { BButton(); return false; };
+        blackButton.GetComponent<Renderer>().material = buttonColour[7];
     }
 
     void Start()
@@ -79,9 +84,8 @@ public class SimonStoresScript : MonoBehaviour
         step[2][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[0]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[1]));
         Debug.LogFormat("[Simon Stores #{1}] D = {0}", D, moduleId);
         Debug.LogFormat("[Simon Stores #{1}] a0 = {0}", step[0][0], moduleId);
-        sequences[0] = Sequence0();
-        sequences[1] = Sequence1();
-        sequences[2] = Sequence2();
+        sequences[0] = Sequence();
+        sequences[1] = Finish();
 
         //Randomising button colours
         for (int i = 6; i > 0; i--)
@@ -744,7 +748,7 @@ public class SimonStoresScript : MonoBehaviour
         if (mode == 0)
         {
             mode = 1;
-            StopCoroutine(sequences[stage - 1]);
+            StopCoroutine(sequences[0]);
             whiteButton.GetComponentInChildren<Light>().enabled = true;
             greyButton.GetComponentInChildren<Light>().enabled = false;
             greyButton.AddInteractionPunch();
@@ -752,6 +756,7 @@ public class SimonStoresScript : MonoBehaviour
             for (int i = 0; i < 6; i++)
             {
                 buttons[i].GetComponentInChildren<Light>().enabled = false;
+                buttonId[i].material = buttonColour[oh.IndexOf(order[i])];
             }
         }
         else if (mode == 1)
@@ -765,6 +770,7 @@ public class SimonStoresScript : MonoBehaviour
             {
                 alreadyPressed[i] = false;
                 buttons[i].GetComponentInChildren<Light>().enabled = false;
+                buttonId[i].material = buttonColour[oh.IndexOf(order[i])];
             }
             blackButton.GetComponentInChildren<Light>().enabled = false;
             greyButton.GetComponentInChildren<Light>().enabled = true;
@@ -773,9 +779,9 @@ public class SimonStoresScript : MonoBehaviour
     }
 
     //Flashing the sequences
-    private IEnumerator Sequence0()
+    private IEnumerator Sequence()
     {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 6 + (2 * stage); i++)
         {
             if (mode == 0)
             {
@@ -784,6 +790,7 @@ public class SimonStoresScript : MonoBehaviour
                     for (int j = 0; j < 6; j++)
                     {
                         buttons[j].GetComponentInChildren<Light>().enabled = false;
+                        buttonId[j].material = buttonColour[oh.IndexOf(order[j])];
                         greyButton.GetComponentInChildren<Light>().enabled = false;
                     }
                 }
@@ -798,146 +805,38 @@ public class SimonStoresScript : MonoBehaviour
                         if (lightSeq[(i / 2) - 1][order.IndexOf('R')] == true)
                         {
                             buttons[order.IndexOf('R')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('R')].material = litColour[0];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('G')] == true)
                         {
                             buttons[order.IndexOf('G')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('G')].material = litColour[1];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('B')] == true)
                         {
                             buttons[order.IndexOf('B')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('B')].material = litColour[2];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('C')] == true)
                         {
                             buttons[order.IndexOf('C')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('C')].material = litColour[3];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('M')] == true)
                         {
                             buttons[order.IndexOf('M')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('M')].material = litColour[4];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('Y')] == true)
                         {
                             buttons[order.IndexOf('Y')].GetComponentInChildren<Light>().enabled = true;
+                            buttonId[order.IndexOf('Y')].material = litColour[5];
                         }
                     }
                 }
                 yield return new WaitForSeconds(flash);
             }
-            if (i == 7)
-            {
-                i = -1;
-            }
-        }
-    }
-
-    private IEnumerator Sequence1()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            if (mode == 0)
-            {
-                if (i % 2 == 1)
-                {
-                    for (int j = 0; j < 6; j++)
-                    {
-                        buttons[j].GetComponentInChildren<Light>().enabled = false;
-                        greyButton.GetComponentInChildren<Light>().enabled = false;
-                    }
-                }
-                else
-                {
-                    if (i == 0)
-                    {
-                        greyButton.GetComponentInChildren<Light>().enabled = true;
-                    }
-                    else
-                    {
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('R')] == true)
-                        {
-                            buttons[order.IndexOf('R')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('G')] == true)
-                        {
-                            buttons[order.IndexOf('G')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('B')] == true)
-                        {
-                            buttons[order.IndexOf('B')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('C')] == true)
-                        {
-                            buttons[order.IndexOf('C')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('M')] == true)
-                        {
-                            buttons[order.IndexOf('M')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('Y')] == true)
-                        {
-                            buttons[order.IndexOf('Y')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                    }
-                }
-                yield return new WaitForSeconds(flash);
-            }
-            if (i == 9)
-            {
-                i = -1;
-            }
-        }
-    }
-
-    private IEnumerator Sequence2()
-    {
-        for (int i = 0; i < 12; i++)
-        {
-            if (mode == 0)
-            {
-                if (i % 2 == 1)
-                {
-                    for (int j = 0; j < 6; j++)
-                    {
-                        buttons[j].GetComponentInChildren<Light>().enabled = false;
-                        greyButton.GetComponentInChildren<Light>().enabled = false;
-                    }
-                }
-                else
-                {
-                    if (i == 0)
-                    {
-                        greyButton.GetComponentInChildren<Light>().enabled = true;
-                    }
-                    else
-                    {
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('R')] == true)
-                        {
-                            buttons[order.IndexOf('R')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('G')] == true)
-                        {
-                            buttons[order.IndexOf('G')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('B')] == true)
-                        {
-                            buttons[order.IndexOf('B')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('C')] == true)
-                        {
-                            buttons[order.IndexOf('C')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('M')] == true)
-                        {
-                            buttons[order.IndexOf('M')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                        if (lightSeq[(i / 2) - 1][order.IndexOf('Y')] == true)
-                        {
-                            buttons[order.IndexOf('Y')].GetComponentInChildren<Light>().enabled = true;
-                        }
-                    }
-                }
-                yield return new WaitForSeconds(flash);
-            }
-            if (i == 11)
+            if (i == 5 + (2 * stage))
             {
                 i = -1;
             }
@@ -955,40 +854,58 @@ public class SimonStoresScript : MonoBehaviour
                 case 0:
                     buttons[5].GetComponentInChildren<Light>().enabled = false;
                     whiteButton.GetComponentInChildren<Light>().enabled = true;
+                    buttonId[5].material = buttonColour[oh.IndexOf(order[5])];
+                    whiteButton.GetComponent<Renderer>().material = litColour[6];
                     break;
                 case 1:
                     whiteButton.GetComponentInChildren<Light>().enabled = false;
                     buttons[0].GetComponentInChildren<Light>().enabled = true;
+                    whiteButton.GetComponent<Renderer>().material = buttonColour[6];
+                    buttonId[0].material = litColour[oh.IndexOf(order[0])];
+
                     break;
                 case 2:
                     buttons[0].GetComponentInChildren<Light>().enabled = false;
                     buttons[1].GetComponentInChildren<Light>().enabled = true;
+                    buttonId[0].material = buttonColour[oh.IndexOf(order[0])];
+                    buttonId[1].material = litColour[oh.IndexOf(order[1])];
                     break;
                 case 3:
                     buttons[1].GetComponentInChildren<Light>().enabled = false;
                     buttons[2].GetComponentInChildren<Light>().enabled = true;
+                    buttonId[1].material = buttonColour[oh.IndexOf(order[1])];
+                    buttonId[2].material = litColour[oh.IndexOf(order[2])];
                     break;
                 case 4:
                     buttons[2].GetComponentInChildren<Light>().enabled = false;
                     blackButton.GetComponentInChildren<Light>().enabled = true;
+                    buttonId[2].material = buttonColour[oh.IndexOf(order[2])];
+                    blackButton.GetComponent<Renderer>().material = litColour[7];
                     break;
                 case 5:
                     blackButton.GetComponentInChildren<Light>().enabled = false;
                     buttons[3].GetComponentInChildren<Light>().enabled = true;
+                    blackButton.GetComponent<Renderer>().material = buttonColour[7];
+                    buttonId[3].material = litColour[oh.IndexOf(order[3])];
                     break;
                 case 6:
                     buttons[3].GetComponentInChildren<Light>().enabled = false;
                     buttons[4].GetComponentInChildren<Light>().enabled = true;
+                    buttonId[3].material = buttonColour[oh.IndexOf(order[3])];
+                    buttonId[4].material = litColour[oh.IndexOf(order[4])];
                     break;
                 case 7:
                     buttons[4].GetComponentInChildren<Light>().enabled = false;
                     buttons[5].GetComponentInChildren<Light>().enabled = true;
+                    buttonId[4].material = buttonColour[oh.IndexOf(order[4])];
+                    buttonId[5].material = litColour[oh.IndexOf(order[5])];
                     break;
             }
             yield return new WaitForSeconds(flash / (2 * stage));
         }
         greyButton.GetComponentInChildren<Light>().enabled = false;
         whiteButton.GetComponentInChildren<Light>().enabled = false;
+        whiteButton.GetComponent<Renderer>().material = buttonColour[6];
 
         //Checking input sequence against final answer
         string[] inputArray = inputList.ToArray();
@@ -1027,7 +944,7 @@ public class SimonStoresScript : MonoBehaviour
             else
             {
                 moduleSolved = true;
-                GetComponent<KMBombModule>().HandlePass();
+                StartCoroutine(sequences[1]);
             }
         }
         else
@@ -1040,7 +957,7 @@ public class SimonStoresScript : MonoBehaviour
         if (moduleSolved == false)
         {
             mode = 0;
-            StartCoroutine(sequences[stage - 1]);
+            StartCoroutine(sequences[0]);
         }
         inputList.Clear();
     }
@@ -1054,7 +971,9 @@ public class SimonStoresScript : MonoBehaviour
             {
                 negativeEntry = false;
                 whiteButton.GetComponentInChildren<Light>().enabled = true;
+                whiteButton.GetComponent<Renderer>().material = litColour[6];
                 blackButton.GetComponentInChildren<Light>().enabled = false;
+                blackButton.GetComponent<Renderer>().material = buttonColour[7];
                 whiteButton.AddInteractionPunch(.5f);
                 GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, transform);
             }
@@ -1070,7 +989,9 @@ public class SimonStoresScript : MonoBehaviour
             {
                 negativeEntry = true;
                 whiteButton.GetComponentInChildren<Light>().enabled = false;
+                whiteButton.GetComponent<Renderer>().material = buttonColour[6];
                 blackButton.GetComponentInChildren<Light>().enabled = true;
+                blackButton.GetComponent<Renderer>().material = litColour[7];
                 blackButton.AddInteractionPunch(.5f);
                 GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, transform);
             }
@@ -1102,6 +1023,7 @@ public class SimonStoresScript : MonoBehaviour
                 }
                 alreadyPressed[tempPress] = true;
                 buttons[tempPress].GetComponentInChildren<Light>().enabled = true;
+                buttonId[buttons.IndexOf(button)].material = litColour[oh.IndexOf(order[buttons.IndexOf(button)])];
                 buttons[tempPress].AddInteractionPunch(.5f);
                 tempNum[2]++;
                 switch (tempNum[2])
@@ -1132,7 +1054,7 @@ public class SimonStoresScript : MonoBehaviour
     //Colourblind accessibility
     void HLButton(KMSelectable button)
     {
-        if (mode != 2)
+        if (mode != 2 && moduleSolved == false)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -1151,7 +1073,34 @@ public class SimonStoresScript : MonoBehaviour
         screen.GetComponentInChildren<TextMesh>().text = String.Empty;
     }
 
-    //Operations used in evaluatating sequence steps
+    private IEnumerator Finish()
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            switch (i)
+            {
+                case 1:
+                    buttonId[0].material = endColour[0];
+                    buttonId[5].material = endColour[0];
+                    break;
+                case 2:
+                    buttonId[1].material = endColour[1];
+                    buttonId[4].material = endColour[1];
+                    break;
+                case 3:
+                    buttonId[2].material = endColour[2];
+                    buttonId[3].material = endColour[2];
+                    break;
+                case 4:
+                    GetComponent<KMBombModule>().HandlePass();
+                    GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
+                    break;
+            }
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    //Operations used in evaluating sequence steps
     int Check(int val)
     {
         while (val > 364)
