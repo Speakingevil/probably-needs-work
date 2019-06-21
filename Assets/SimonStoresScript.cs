@@ -49,6 +49,8 @@ public class SimonStoresScript : MonoBehaviour
     private char[][] balancedTrits = new char[3][] { new char[6], new char[6], new char[6] };
     private bool[][] lightSeq = new bool[5][] {new bool[6], new bool[6], new bool[6], new bool[6], new bool[6] };
     private string[] finalAnswer = new string[3];
+    private string[][] funcseq = new string[3][] { new string[6], new string[6], new string[6]};
+    private string[] funccatch = new string[5]; 
 
     //Logging
     static int moduleIdCounter = 1;
@@ -697,7 +699,7 @@ public class SimonStoresScript : MonoBehaviour
                         }
                         break;
                 }
-                //Resetting unused (at their current step) values
+                //Resetting unused values
                 step[0][4] = 0;
                 step[0][5] = 0;
                 step[1][5] = 0;
@@ -705,7 +707,7 @@ public class SimonStoresScript : MonoBehaviour
                 {
                     if (0 < j && j < 4)
                     {
-                        Debug.LogFormat("[Simon Stores #{0}] a{1} = {2}", moduleId, j, step[0][j]);
+                        Debug.LogFormat("[Simon Stores #{0}] a{1} = {2}", moduleId, j, funcseq[0][j]);
                     }
                 }
             }
@@ -755,7 +757,6 @@ public class SimonStoresScript : MonoBehaviour
             GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
             for (int i = 0; i < 6; i++)
             {
-                buttons[i].GetComponentInChildren<Light>().enabled = false;
                 buttonId[i].material = buttonColour[oh.IndexOf(order[i])];
             }
         }
@@ -769,10 +770,10 @@ public class SimonStoresScript : MonoBehaviour
             for (int i = 0; i < 6; i++)
             {
                 alreadyPressed[i] = false;
-                buttons[i].GetComponentInChildren<Light>().enabled = false;
                 buttonId[i].material = buttonColour[oh.IndexOf(order[i])];
             }
             blackButton.GetComponentInChildren<Light>().enabled = false;
+            blackButton.GetComponent<Renderer>().material = buttonColour[7];
             greyButton.GetComponentInChildren<Light>().enabled = true;
             StartCoroutine(StartButtonMode2());
         }
@@ -789,7 +790,6 @@ public class SimonStoresScript : MonoBehaviour
                 {
                     for (int j = 0; j < 6; j++)
                     {
-                        buttons[j].GetComponentInChildren<Light>().enabled = false;
                         buttonId[j].material = buttonColour[oh.IndexOf(order[j])];
                         greyButton.GetComponentInChildren<Light>().enabled = false;
                     }
@@ -804,32 +804,26 @@ public class SimonStoresScript : MonoBehaviour
                     {
                         if (lightSeq[(i / 2) - 1][order.IndexOf('R')] == true)
                         {
-                            buttons[order.IndexOf('R')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('R')].material = litColour[0];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('G')] == true)
                         {
-                            buttons[order.IndexOf('G')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('G')].material = litColour[1];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('B')] == true)
                         {
-                            buttons[order.IndexOf('B')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('B')].material = litColour[2];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('C')] == true)
                         {
-                            buttons[order.IndexOf('C')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('C')].material = litColour[3];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('M')] == true)
                         {
-                            buttons[order.IndexOf('M')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('M')].material = litColour[4];
                         }
                         if (lightSeq[(i / 2) - 1][order.IndexOf('Y')] == true)
                         {
-                            buttons[order.IndexOf('Y')].GetComponentInChildren<Light>().enabled = true;
                             buttonId[order.IndexOf('Y')].material = litColour[5];
                         }
                     }
@@ -852,51 +846,39 @@ public class SimonStoresScript : MonoBehaviour
             switch (i % 8)
             {
                 case 0:
-                    buttons[5].GetComponentInChildren<Light>().enabled = false;
                     whiteButton.GetComponentInChildren<Light>().enabled = true;
                     buttonId[5].material = buttonColour[oh.IndexOf(order[5])];
                     whiteButton.GetComponent<Renderer>().material = litColour[6];
                     break;
                 case 1:
                     whiteButton.GetComponentInChildren<Light>().enabled = false;
-                    buttons[0].GetComponentInChildren<Light>().enabled = true;
                     whiteButton.GetComponent<Renderer>().material = buttonColour[6];
                     buttonId[0].material = litColour[oh.IndexOf(order[0])];
 
                     break;
                 case 2:
-                    buttons[0].GetComponentInChildren<Light>().enabled = false;
-                    buttons[1].GetComponentInChildren<Light>().enabled = true;
                     buttonId[0].material = buttonColour[oh.IndexOf(order[0])];
                     buttonId[1].material = litColour[oh.IndexOf(order[1])];
                     break;
                 case 3:
-                    buttons[1].GetComponentInChildren<Light>().enabled = false;
-                    buttons[2].GetComponentInChildren<Light>().enabled = true;
                     buttonId[1].material = buttonColour[oh.IndexOf(order[1])];
                     buttonId[2].material = litColour[oh.IndexOf(order[2])];
                     break;
                 case 4:
-                    buttons[2].GetComponentInChildren<Light>().enabled = false;
                     blackButton.GetComponentInChildren<Light>().enabled = true;
                     buttonId[2].material = buttonColour[oh.IndexOf(order[2])];
                     blackButton.GetComponent<Renderer>().material = litColour[7];
                     break;
                 case 5:
                     blackButton.GetComponentInChildren<Light>().enabled = false;
-                    buttons[3].GetComponentInChildren<Light>().enabled = true;
                     blackButton.GetComponent<Renderer>().material = buttonColour[7];
                     buttonId[3].material = litColour[oh.IndexOf(order[3])];
                     break;
                 case 6:
-                    buttons[3].GetComponentInChildren<Light>().enabled = false;
-                    buttons[4].GetComponentInChildren<Light>().enabled = true;
                     buttonId[3].material = buttonColour[oh.IndexOf(order[3])];
                     buttonId[4].material = litColour[oh.IndexOf(order[4])];
                     break;
                 case 7:
-                    buttons[4].GetComponentInChildren<Light>().enabled = false;
-                    buttons[5].GetComponentInChildren<Light>().enabled = true;
                     buttonId[4].material = buttonColour[oh.IndexOf(order[4])];
                     buttonId[5].material = litColour[oh.IndexOf(order[5])];
                     break;
@@ -919,24 +901,24 @@ public class SimonStoresScript : MonoBehaviour
                 if (stage == 2)
                 {
                     Debug.LogFormat("[Simon Stores #{1}] b0 = {0}", step[1][0], moduleId);
-                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[3]);
-                    Debug.LogFormat("[Simon Stores #{1}] The button order for stage 2 was {0}", new string(executionOrder[1]), moduleId);
                     for (int i = 1; i < 5; i++)
                     {
-                        Debug.LogFormat("[Simon Stores #{1}] b{2} = {0}", step[1][i], moduleId, i);
+                        Debug.LogFormat("[Simon Stores #{1}] b{2} = {0}", funcseq[1][i], moduleId, i);
                     }
+                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[3]);
+                    Debug.LogFormat("[Simon Stores #{1}] The button order for stage 2 was {0}", new string(executionOrder[1]), moduleId);
                     Debug.LogFormat("[Simon Stores #{1}] {2} in balanced ternary is {0}", new string(balancedTrits[1]), moduleId, step[1][4]);
                     Debug.LogFormat("[Simon Stores #{1}] The correct input for stage 2 was {0}", finalAnswer[1], moduleId);
                 }
                 else
                 {
                     Debug.LogFormat("[Simon Stores #{1}] c0 = {0}", step[2][0], moduleId);
-                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[4]);
-                    Debug.LogFormat("[Simon Stores #{1}] The button order for stage 3 was {0}", new string(executionOrder[2]), moduleId);
                     for (int i = 1; i < 6; i++)
                     {
-                        Debug.LogFormat("[Simon Stores #{1}] c{2} = {0}", step[2][i], moduleId, i);
+                        Debug.LogFormat("[Simon Stores #{1}] c{2} = {0}", funcseq[2][i], moduleId, i);
                     }
+                    Debug.LogFormat("[Simon Stores #{0}] The flashing order has added {1}", moduleId, flashingColours[4]);
+                    Debug.LogFormat("[Simon Stores #{1}] The button order for stage 3 was {0}", new string(executionOrder[2]), moduleId);
                     Debug.LogFormat("[Simon Stores #{1}] {2} in balanced ternary is {0}", new string(balancedTrits[2]), moduleId, step[2][5]);
                     Debug.LogFormat("[Simon Stores #{1}] The correct input for stage 3 was {0}", finalAnswer[2], moduleId);
                 }
@@ -1022,7 +1004,6 @@ public class SimonStoresScript : MonoBehaviour
                     inputList.Add("-" + new string(order[tempPress], 1));
                 }
                 alreadyPressed[tempPress] = true;
-                buttons[tempPress].GetComponentInChildren<Light>().enabled = true;
                 buttonId[buttons.IndexOf(button)].material = litColour[oh.IndexOf(order[buttons.IndexOf(button)])];
                 buttons[tempPress].AddInteractionPunch(.5f);
                 tempNum[2]++;
@@ -1103,6 +1084,7 @@ public class SimonStoresScript : MonoBehaviour
     //Operations used in evaluating sequence steps
     int Check(int val)
     {
+        int v = val;
         while (val > 364)
         {
             val -= 365;
@@ -1116,16 +1098,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Red(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x += D;
+                funcseq[0][j] = "R(" + v + ") = " + v + " + " + D + " = " + x;
                 break;
             case 1:
                 x += step[0][j - 1] + (int)Math.Pow(j,2);
+                funcseq[1][j] = "R(" + v + ") = " + v + " + " + step[0][j - 1] + " + " + (int)Math.Pow(j,2) + " = " + x;
                 break;
             case 2:
                 x += step[1][j - 1] - step[0][j - 1];
+                funcseq[2][j] = "R(" + v + ") = " + v + " + " + step[1][j - 1] + " - " + step[0][j - 1] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1134,16 +1120,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Green(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x -= D;
+                funcseq[0][j] = "G(" + v + ") = " + v + " - " + D + " = " + x;
                 break;
             case 1:
                 x = (2 * x) - step[0][j - 1];
+                funcseq[1][j] = "G(" + v + ") = " + "2*" + v + " - " + step[0][j - 1] + " = " + x;
                 break;
             case 2:
                 x -= 2 * step[1][j - 1];
+                funcseq[2][j] = "G(" + v + ") = " + v + " - " + "2*" + step[1][j - 1] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1152,16 +1142,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Blue(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x = (2 * x) - D;
+                funcseq[0][j] = "B(" + v + ") = " + "2*" + v + " - " + D + " = " + x;
                 break;
             case 1:
                 x = (2 * x) - step[0][0] - (4 * (int)Math.Pow(j, 2));
+                funcseq[1][j] = "B(" + v + ") = " + "2*" + v + " - " + step[0][0] + " - " + 4 * (int)Math.Pow(j, 2) + " = " + x;
                 break;
             case 2:
                 x += step[1][0] -  step[0][3];
+                funcseq[2][j] = "B(" + v + ") = " + v + " + " + step[1][0] + " - " + step[0][3] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1170,16 +1164,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Cyan(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x = D - (8 * j) - x;
+                funcseq[0][j] = "C(" + v + ") = " + D + " - " + v + " - " + 8 * j + " = " + x;
                 break;
             case 1:
                 x += step[0][1];
+                funcseq[1][j] = "C(" + v + ") = " + v + " + " + step[0][1] + " = " + x;
                 break;
             case 2:
                 x += step[0][j - 1] - step[1][j - 1] ;
+                funcseq[2][j] = "C(" + v + ") = " + v + " + " + step[0][j - 1] + " - " + step[1][j - 1] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1188,16 +1186,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Magenta(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x = (3 * (int)Math.Pow(j, 3)) - (2 * x);
+                funcseq[0][j] = "M(" + v + ") = " + 3 * (int)Math.Pow(j, 3) + " - " + "2*" + v + " = " + x;
                 break;
             case 1:
                 x += step[0][2] - D;
+                funcseq[1][j] = "M(" + v + ") = " + v + " + " + step[0][2] + " - " + D + " = " + x;
                 break;
             case 2:
                 x -= 2 * step[0][j - 1];
+                funcseq[2][j] = "M(" + v + ") = " + v + " - " + "2*" + step[0][j - 1] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1206,16 +1208,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int Yellow(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x += D - (6 * j);
+                funcseq[0][j] = "Y(" + v + ") = " + v + " + " + D + " - " + 6 * j + " = " + x;
                 break;
             case 1:
                 x += step[0][3] - step[0][j - 1];
+                funcseq[1][j] = "Y(" + v + ") = " + v + " + " + step[0][3] + " - " + step[0][j - 1] + " = " + x;
                 break;
             case 2:
                 x += step[1][4] - step[0][0];
+                funcseq[2][j] = "Y(" + v + ") = " + v + " + " + step[1][4] + " - " + step[0][0] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1224,16 +1230,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int ReGr(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Green(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Max(Red(x, 0, j), Green(x, 0, j));
+                funccatch[2] = "RG(" + v + ") = " + "max([" + Red(v, 0, j) + "], " + "[" + Green(v, 0, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
+                Red(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Green(v, 1, j);
+                funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Red(x, 1, j) - Green(x, 1, j));
+                funccatch[2] = "RG(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Blue(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(step[1][j - 1], 2, j);
+                funccatch[1] = funcseq[2][j];
+                Blue(step[2][j - 1], 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Blue(x, 2, j) + Blue(step[1][j - 1], 2, j) + Blue(step[0][j - 1], 2, j);
+                funccatch[3] = "RG(" + v + ") = " + "[" + Blue(v, 2, j) + "] + [" + Blue(step[1][j - 1], 2, j) + "] + [" + Blue(step[0][j - 1], 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1242,16 +1269,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int ReBl(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Max(Red(x, 0, j), Blue(x, 0, j));
+                funccatch[2] = "RB(" + v + ") = " + "max([" + Red(v,0,j) + "], " + "[" + Blue(v,0,j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
+                Red(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, 1, j);
+                funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Red(x, 1, j) - Blue(x, 1, j));
+                funccatch[2] = "RB(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Green(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Green(step[1][j - 1], 2, j);
+                funccatch[1] = funcseq[2][j];
+                Green(step[2][j - 1], 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Green(x, 2, j) + Green(step[1][j - 1], 2, j) + Green(step[0][j - 1], 2, j);
+                funccatch[3] = "RB(" + v + ") = " + "[" + Green(v, 2, j) + "] + [" + Green(step[1][j - 1], 2, j) + "] + [" + Green(step[0][j - 1], 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1260,16 +1308,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int ReCy(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Cyan(x, 0, j) - (2 * D);
+                funccatch[2] = "RC(" + v + ") = [" + Red(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Red(x, 1, j) - Cyan(x, 1, j));
+                Red(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Cyan(x, 1, j)));
+                funccatch[2] = "RC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Red(x, 2, j), Cyan(x, 2, j), -Math.Abs(Red(x, 2, j) - Cyan(x, 2, j)));
+                Red(v, 1, j);
+                funccatch[0] = funcseq[2][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Red(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Cyan(x, 2, j))));
+                funccatch[2] = "RC(" + v + ") = min([" + Red(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1278,16 +1345,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int ReMa(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Magenta(x, 0, j) - (2 * D);
+                funccatch[2] = "RM(" + v + ") = [" + Red(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Red(x, 1, j) - Magenta(x, 1, j));
+                Red(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Magenta(x, 1, j)));
+                funccatch[2] = "RM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Red(x, 2, j), Magenta(x, 2, j), -Math.Abs(Red(x, 2, j) - Magenta(x, 2, j)));
+                Red(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Red(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Magenta(x, 2, j))));
+                funccatch[2] = "RM(" + v + ") = min([" + Red(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1296,16 +1382,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int ReYe(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Yellow(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Yellow(x, 0, j) - (2 * D);
+                funccatch[2] = "RY(" + v + ") = [" + Red(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Red(x, 1, j) - Yellow(x, 1, j));
+                Red(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Yellow(x, 1, j)));
+                funccatch[2] = "RY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Red(x, 2, j), Yellow(x, 2, j), -Math.Abs(Red(x, 2, j) - Yellow(x, 2, j)));
+                Red(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Red(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Yellow(x, 2, j))));
+                funccatch[2] = "RY(" + v + ") = min([" + Red(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1314,16 +1419,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int GrBl(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Max(Green(x, 0, j), Blue(x, 0, j));
+                funccatch[2] = "GB(" + v + ") = " + "max([" + Green(v, 0, j) + "], " + "[" + Blue(v, 0, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
+                Green(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, 1, j);
+                funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Green(x, 1, j) - Blue(x, 1, j));
+                funccatch[2] = "GB(" + v + ") = " + "abs([" + Green(v, 1, j) + "] - [" + Blue(v, 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Red(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Red(step[1][j - 1], 2, j);
+                funccatch[1] = funcseq[2][j];
+                Red(step[2][j - 1], 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Red(x, 2, j) + Red(step[1][j - 1], 2, j) + Red(step[0][j - 1], 2, j);
+                funccatch[3] = "GB(" + v + ") = " + "[" + Red(v, 2, j) + "] + [" + Red(step[1][j - 1], 2, j) + "] + [" + Red(step[0][j - 1], 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1332,16 +1458,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int GrCy(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
-                x = Green(x, 0, j) + Cyan(x, 0, j) - 2 * D;
+                Green(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, 0, j);
+                funccatch[1] = funcseq[0][j];
+                x = Green(x, 0, j) + Cyan(x, 0, j) - (2 * D);
+                funccatch[2] = "GC(" + v + ") = [" + Green(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = 4 * D - Math.Abs(Green(x, 1, j) - Cyan(x, 1, j));
+                Green(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Cyan(x, 1, j)));
+                funccatch[2] = "GC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Green(x, 2, j), Cyan(x, 2, j), -Math.Abs(Green(x, 2, j) - Cyan(x, 2, j)));
+                Green(v, 1, j);
+                funccatch[0] = funcseq[2][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Green(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Cyan(x, 2, j))));
+                funccatch[2] = "GC(" + v + ") = min([" + Green(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1350,16 +1495,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int GrMa(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Green(x, 0, j) + Magenta(x, 0, j) - (2 * D);
+                funccatch[2] = "GM(" + v + ") = [" + Green(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Green(x, 1, j) - Magenta(x, 1, j));
+                Green(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Magenta(x, 1, j)));
+                funccatch[2] = "GM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Green(x, 2, j), Magenta(x, 2, j), -Math.Abs(Green(x, 2, j) - Magenta(x, 2, j)));
+                Green(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Green(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Magenta(x, 2, j))));
+                funccatch[2] = "GM(" + v + ") = min([" + Green(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1368,16 +1532,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int GrYe(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Yellow(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Green(x, 0, j) + Yellow(x, 0, j) - (2 * D);
+                funccatch[2] = "GY(" + v + ") = [" + Green(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Green(x, 1, j) - Yellow(x, 1, j));
+                Green(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Yellow(x, 1, j)));
+                funccatch[2] = "GY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Green(x, 2, j), Yellow(x, 2, j), -Math.Abs(Green(x, 2, j) - Yellow(x, 2, j)));
+                Green(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Green(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Yellow(x, 2, j))));
+                funccatch[2] = "GY(" + v + ") = min([" + Green(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1386,16 +1569,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int BlCy(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Blue(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Cyan(x, 0, j) - (2 * D);
+                funccatch[2] = "BC(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Blue(x, 1, j) - Cyan(x, 1, j));
+                Blue(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Cyan(x, 1, j)));
+                funccatch[2] = "BC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), -Math.Abs(Blue(x, 2, j) - Cyan(x, 2, j)));
+                Blue(v, 1, j);
+                funccatch[0] = funcseq[2][j];
+                Cyan(v, 1, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Cyan(x, 2, j))));
+                funccatch[2] = "BC(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1404,16 +1606,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int BlMa(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Blue(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Magenta(x, 0, j) - (2 * D);
+                funccatch[2] = "BM(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Blue(x, 1, j) - Magenta(x, 1, j));
+                Blue(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Magenta(x, 1, j)));
+                funccatch[2] = "BM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Blue(x, 2, j), Magenta(x, 2, j), -Math.Abs(Blue(x, 2, j) - Magenta(x, 2, j)));
+                Blue(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Blue(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Magenta(x, 2, j))));
+                funccatch[2] = "BM(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1422,16 +1643,35 @@ public class SimonStoresScript : MonoBehaviour
 
     int BlYe(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Blue(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Yellow(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Yellow(x, 0, j) - (2 * D);
+                funccatch[2] = "BY(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = (4 * D) - Math.Abs(Blue(x, 1, j) - Yellow(x, 1, j));
+                Blue(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(v, 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Yellow(x, 1, j)));
+                funccatch[2] = "BY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
-                x = Mathf.Min(Blue(x, 2, j), Yellow(x, 2, j), -Math.Abs(Blue(x, 2, j) - Yellow(x, 2, j)));
+                Blue(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                x = Mathf.Min(Blue(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Yellow(x, 2, j))));
+                funccatch[2] = "BY(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
+                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1440,16 +1680,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int CyMa(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Cyan(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Min(Cyan(x, 0, j), Magenta(x, 0, j));
+                funccatch[2] = "CM(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Magenta(v, 0, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
-                x = Math.Max(Yellow(x, 1, j) , Yellow(step[0][j - 1], 1, j));
+                Yellow(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], 1, j);
+                funccatch[1] = funcseq[1][j];
+                x = Math.Max(Yellow(x, 1, j), Yellow(step[0][j - 1], 1, j));
+                funccatch[2] = "CM(" + v + ") = " + "max([" + Yellow(v, 1, j) + "], " + "[" + Yellow(step[1][j - 1], 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Yellow(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Cyan(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                Magenta(v, 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Yellow(x, 2, j) - Magenta(x, 2, j) - Cyan(x, 2, j);
+                funccatch[3] = "CM(" + v + ") = [" + Yellow(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1458,16 +1719,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int CyYe(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Cyan(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Yellow(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Min(Cyan(x, 0, j), Yellow(x, 0, j));
+                funccatch[2] = "CY(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
+                Magenta(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(step[0][j - 1], 1, j);
+                funccatch[1] = funcseq[1][j];
                 x = Math.Max(Magenta(x, 1, j), Magenta(step[0][j - 1], 1, j));
+                funccatch[2] = "CY(" + v + ") = " + "max([" + Magenta(v, 1, j) + "], " + "[" + Magenta(step[1][j - 1], 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Magenta(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Cyan(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                Yellow(v, 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Magenta(x, 2, j) - Cyan(x, 2, j) - Yellow(x, 2, j);
+                funccatch[3] = "CY(" + v + ") = [" + Magenta(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1476,16 +1758,37 @@ public class SimonStoresScript : MonoBehaviour
 
     int MaYe(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Magenta(v, 0, j);
+                funccatch[0] = funcseq[0][j];
+                Yellow(v, 0, j);
+                funccatch[1] = funcseq[0][j];
                 x = Math.Min(Magenta(x, 0, j), Yellow(x, 0, j));
+                funccatch[2] = "MY(" + v + ") = " + "min([" + Magenta(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 1:
+                Cyan(v, 1, j);
+                funccatch[0] = funcseq[1][j];
+                Cyan(step[0][j - 1], 1, j);
+                funccatch[1] = funcseq[1][j];
                 x = Math.Max(Cyan(x, 1, j), Cyan(step[0][j - 1], 1, j));
+                funccatch[2] = "MY(" + v + ") = " + "max([" + Cyan(v, 1, j) + "], " + "[" + Cyan(step[1][j - 1], 1, j) + "]) = " + x;
+                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
             case 2:
+                Cyan(v, 2, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, 2, j);
+                funccatch[1] = funcseq[2][j];
+                Yellow(v, 2, j);
+                funccatch[2] = funcseq[2][j];
                 x = Cyan(x, 2, j) - Magenta(x, 2, j) - Yellow(x, 2, j);
+                funccatch[3] = "MY(" + v + ") = [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x;
+                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1494,16 +1797,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int RGB(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x += step[0][0];
+                funcseq[0][j] = "RGB(" + v + ") = " + v + " + " + step[0][0] + " = " + x;
                 break;
             case 1:
                 x += (((x + 400) % 4) * step[1][0]) - step[0][3];
+                funcseq[1][j] = "RGB(" + v + ") = " + v + " + (" + v % 4 + ")*" + step[1][0] + " - " + step[0][3] + " = " + x;
                 break;
             case 2:
                 x += (((x + 600) % 3) * step[2][0]) - (((step[1][j - 1] + 600) % 3) * step[1][0]) + (((step[0][j - 1] + 600) % 3) * step[0][0]);
+                funcseq[2][j] = "RGB(" + v + ") = " + v + " + (" + v % 3 + ")*" + step[2][0] + " - " + "(" + step[1][j - 1] % 3 + ")*" + step[1][0] + "(" + step[0][j - 1] % 3 + ")*" + step[0][0] + " = " + x;
                 break;
         }
         x = Check(x);
@@ -1512,16 +1819,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RGC(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x,i,j),Green(x,i,j),Cyan(x,i,j));
+                funccatch[3] = "RGC(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x,i,j) + Green(x,i,j) - Cyan(step[0][j - 1],i,j);
+                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Cyan(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x,i,j) + Green(x,i,j) - Cyan(step[1][j - 1],i,j) - Cyan(step[0][j - 1],i,j);
+                funccatch[4] = "RGC(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1530,16 +1864,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RGM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Green(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "RGM(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Green(x, i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[3] = "RGM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Magenta(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Green(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[4] = "RGM(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1548,16 +1909,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RGY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Green(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "RGY(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Green(x, i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Green(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Yellow(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Green(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[4] = "RGY(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1566,16 +1954,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RBC(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Cyan(x, i, j));
+                funccatch[3] = "RBC(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Cyan(step[0][j - 1], i, j);
+                funccatch[3] = "RBC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Cyan(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Cyan(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
+                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1584,16 +1999,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RBM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "RBM(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[3] = "RBM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Magenta(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1602,16 +2044,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RBY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "RBY(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Red(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[3] = "RBY(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Red(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Yellow(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[4] = "RBY(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1620,16 +2089,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RCM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Red(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "RCM(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Red(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Red(x, i, j);
+                funccatch[3] = "RCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Red(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Red(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
+                funccatch[4] = "RCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1638,16 +2134,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RCY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Red(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "RCY(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Red(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Red(x, i, j);
+                funccatch[3] = "RCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Red(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Red(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
+                funccatch[4] = "RCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1656,16 +2179,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int RMY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
-                x = Mathf.Min(Red(x, i, j), Yellow(x, i, j), Magenta(x, i, j));
+                Red(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
+                x = Mathf.Min(Red(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "RMY(" + v + ") = min([" + Red(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
-                x += Yellow(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Red(x, i, j);
+                Magenta(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Red(v, i, j);
+                funccatch[2] = funcseq[1][j];
+                x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Red(x, i, j);
+                funccatch[3] = "RMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
-                x = Yellow(x, i, j) + Magenta(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
+                Magenta(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Red(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Red(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
+                x = Magenta(x, i, j) + Yellow(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
+                funccatch[4] = "RMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1674,16 +2224,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GBC(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Cyan(x, i, j));
+                funccatch[3] = "GBC(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Green(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Cyan(step[0][j - 1], i, j);
+                funccatch[3] = "GBC(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Green(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Cyan(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Cyan(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Green(x, i, j) + Blue(x, i, j) - Cyan(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
+                funccatch[4] = "GBC(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1692,16 +2269,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GBM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "GBM(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Green(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[3] = "GBM(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
-                x = Green(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
+                Green(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Magenta(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
+                x = Green(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
+                funccatch[4] = "GBM(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1710,16 +2314,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GBY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "GBY(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Green(v, i, j);
+                funccatch[0] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[3] = "GBY(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Green(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Blue(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Yellow(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Green(x, i, j) + Blue(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
+                funccatch[4] = "GBY(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1728,16 +2359,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GCM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "GCM(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Green(x, i, j);
+                funccatch[3] = "GCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Green(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Green(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
+                funccatch[4] = "GCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1746,16 +2404,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GCY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "GCY(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Green(x, i, j);
+                funccatch[3] = "GCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Green(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Green(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
+                funccatch[4] = "GCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1764,16 +2449,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int GMY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Green(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "GMY(" + v + ") = min([" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Magenta(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Green(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Green(x, i, j);
+                funccatch[3] = "GMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Magenta(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Green(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Green(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Magenta(x, i, j) + Yellow(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
+                funccatch[4] = "GMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1782,16 +2494,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int BCM(int x, int i, int j)
     {
+        int v = x;
         switch (i)
-        {
+        {                  
             case 0:
+                Blue(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
+                funccatch[3] = "BCM(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Magenta(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Blue(x, i, j);
+                funccatch[3] = "BCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Blue(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Blue(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
+                funccatch[4] = "BCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1800,16 +2539,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int BCY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Blue(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Cyan(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "BCY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Cyan(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Blue(x, i, j);
+                funccatch[3] = "BCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Cyan(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Blue(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Blue(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
+                funccatch[4] = "BCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1818,16 +2584,43 @@ public class SimonStoresScript : MonoBehaviour
 
     int BMY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
+                Blue(v, i, j);
+                funccatch[0] = funcseq[0][j];
+                Magenta(v, i, j);
+                funccatch[1] = funcseq[0][j];
+                Yellow(v, i, j);
+                funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
+                funccatch[3] = "BMY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
+                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 1:
+                Magenta(step[0][j - 1], i, j);
+                funccatch[0] = funcseq[1][j];
+                Yellow(step[0][j - 1], i, j);
+                funccatch[1] = funcseq[1][j];
+                Blue(v, i, j);
+                funccatch[2] = funcseq[1][j];
                 x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Blue(x, i, j);
+                funccatch[3] = "BMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
+                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
                 break;
             case 2:
+                Magenta(v, i, j);
+                funccatch[0] = funcseq[2][j];
+                Yellow(v, i, j);
+                funccatch[1] = funcseq[2][j];
+                Blue(step[1][j - 1], i, j);
+                funccatch[2] = funcseq[2][j];
+                Blue(step[0][j - 1], i, j);
+                funccatch[3] = funcseq[2][j];
                 x = Magenta(x, i, j) + Yellow(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
+                funccatch[4] = "BMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
+                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1836,16 +2629,20 @@ public class SimonStoresScript : MonoBehaviour
 
     int CMY(int x, int i, int j)
     {
+        int v = x;
         switch (i)
         {
             case 0:
                 x -= step[0][0];
+                funcseq[0][j] = "CMY(" + v + ") = " + v + " - " + step[0][0] + " = " + x;
                 break;
             case 1:
                 x += (((step[1][0] + 400) % 4) * x) - step[0][3];
+                funcseq[1][j] = "CMY(" + v + ") = " + v + " + (" + step[1][0] % 4 + ")*" + v + " - " + step[0][3] + " = " + x;
                 break;
             case 2:
                 x += (((step[2][0] + 600) % 3) * x) - (((step[1][0] + 600) % 3) * step[1][j - 1]) + (((step[0][0] + 600) % 3) * step[0][j - 1]);
+                funcseq[2][j] = "CMY(" + v + ") = " + v + " + (" + step[2][0] % 3 + ")*" + v + " - " + "(" + step[1][0] % 3 + ")*" + step[1][j - 1] + "(" + step[0][0] % 3 + ")*" + step[0][j - 1] + " = " + x;
                 break;
         }
         x = Check(x);
