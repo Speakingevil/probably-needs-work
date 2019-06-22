@@ -50,7 +50,8 @@ public class SimonStoresScript : MonoBehaviour
     private bool[][] lightSeq = new bool[5][] {new bool[6], new bool[6], new bool[6], new bool[6], new bool[6] };
     private string[] finalAnswer = new string[3];
     private string[][] funcseq = new string[3][] { new string[6], new string[6], new string[6]};
-    private string[] funccatch = new string[5]; 
+    private string[] funccatch = new string[5];
+    private List<string> ruleList = new List<string> { };
 
     //Logging
     static int moduleIdCounter = 1;
@@ -81,11 +82,11 @@ public class SimonStoresScript : MonoBehaviour
     {
         //Determining initial values
         D = digits.IndexOf(Bomb.GetSerialNumber()[0]) + digits.IndexOf(Bomb.GetSerialNumber()[1]) + digits.IndexOf(Bomb.GetSerialNumber()[2]) + digits.IndexOf(Bomb.GetSerialNumber()[3]) + digits.IndexOf(Bomb.GetSerialNumber()[4]) + digits.IndexOf(Bomb.GetSerialNumber()[5]);
-        step[0][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[2]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[3]));
+        step[0][0] = digits.IndexOf(Bomb.GetSerialNumber()[2]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[3]);
         step[1][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[4]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[5]));
         step[2][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[0]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[1]));
-        Debug.LogFormat("[Simon Stores #{1}] D = {0}", D, moduleId);
-        Debug.LogFormat("[Simon Stores #{1}] a0 = {0}", step[0][0], moduleId);
+        Debug.LogFormat("[Simon Stores #{1}] D = {2} + {3} + {4} + {5} + {6} + {7} = {0}", D, moduleId, digits.IndexOf(Bomb.GetSerialNumber()[0]), digits.IndexOf(Bomb.GetSerialNumber()[1]), digits.IndexOf(Bomb.GetSerialNumber()[2]), digits.IndexOf(Bomb.GetSerialNumber()[3]), digits.IndexOf(Bomb.GetSerialNumber()[4]), digits.IndexOf(Bomb.GetSerialNumber()[5]));
+        Debug.LogFormat("[Simon Stores #{1}] a0 = {2}*36 + {3} = {0}", step[0][0], moduleId, digits.IndexOf(Bomb.GetSerialNumber()[2]));
         sequences[0] = Sequence();
         sequences[1] = Finish();
 
@@ -156,6 +157,10 @@ public class SimonStoresScript : MonoBehaviour
             //Shifting entries one to the right when yellow is top left
             if (order.IndexOf('Y') == 0)
             {
+                if (i == 0)
+                {
+                    ruleList.Add("1");
+                }
                 char temp = executionOrder[i][5];
                 for (int j = 4; j >= 0; j--)
                 {
@@ -166,6 +171,10 @@ public class SimonStoresScript : MonoBehaviour
             //Swapping entries with their complements when red is opposite cyan
             if ((order.IndexOf('R') % 3) == (order.IndexOf('C') % 3))
             {
+                if (i == 0)
+                {
+                    ruleList.Add("2");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     switch (executionOrder[i][j])
@@ -203,6 +212,10 @@ public class SimonStoresScript : MonoBehaviour
             //Cycling primary entries when green is adjacent to white
             if (order.IndexOf('G') == 0 || order.IndexOf('G') == 5)
             {
+                if (i == 0)
+                {
+                    ruleList.Add("3");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     switch (executionOrder[i][j])
@@ -225,6 +238,10 @@ public class SimonStoresScript : MonoBehaviour
             //Cycling secondary entries when magenta is adjacent to black
             if (order.IndexOf('M') == 2 || order.IndexOf('M') == 3)
             {
+                if (i == 0)
+                {
+                    ruleList.Add("4");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     switch (executionOrder[i][j])
@@ -247,6 +264,10 @@ public class SimonStoresScript : MonoBehaviour
             //Swapping B with its opposite entry when blue and yellow are on the same side
             if ((order.IndexOf('B') < 3 && order.IndexOf('Y') < 3) || (order.IndexOf('B') > 2 && order.IndexOf('Y') > 2))
             {
+                if (i == 0)
+                {
+                    ruleList.Add("5");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     if (executionOrder[i][j] == 'B')
@@ -261,6 +282,10 @@ public class SimonStoresScript : MonoBehaviour
             //Swapping R and Y when red is on the right side
             if (order.IndexOf('R') < 3)
             {
+                if (i == 0)
+                {
+                    ruleList.Add("6");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     if (executionOrder[i][j] == 'R')
@@ -278,6 +303,10 @@ public class SimonStoresScript : MonoBehaviour
             //Swapping G and C when blue is on the left side
             if (order.IndexOf('B') > 2)
             {
+                if (i == 0)
+                {
+                    ruleList.Add("7");
+                }
                 for (int j = 0; j < 6; j++)
                 {
                     if (executionOrder[i][j] == 'G')
@@ -737,6 +766,14 @@ public class SimonStoresScript : MonoBehaviour
         }
         string[] f = fc.ToArray();
         Debug.LogFormat("[Simon Stores #{0}] The flashing order for stage 1 was {1}", moduleId, String.Join(", ", f));
+        if (ruleList.Count() == 0)
+        {
+            Debug.LogFormat("[Simon Stores #{0}] No conditions are met", moduleId);
+        }
+        else
+        {
+            Debug.LogFormat("[Simon Stores #{0}] The conditions that are met are: {1}", moduleId, String.Join(", ", ruleList.ToArray()));
+        }
         Debug.LogFormat("[Simon Stores #{0}] The pressing order for stage 1 was {1}", moduleId, new string(executionOrder[0]));
         Debug.LogFormat("[Simon Stores #{0}] {2} in balanced ternary is {1}", moduleId, new string(balancedTrits[0]), step[0][3]);
         Debug.LogFormat("[Simon Stores #{1}] The correct input for stage 1 was {0}", finalAnswer[stage - 1], moduleId);
@@ -900,7 +937,7 @@ public class SimonStoresScript : MonoBehaviour
                 stage++;
                 if (stage == 2)
                 {
-                    Debug.LogFormat("[Simon Stores #{1}] b0 = {0}", step[1][0], moduleId);
+                    Debug.LogFormat("[Simon Stores #{1}] b0 = {2}*36 + {3} = {4} \u2248 {0}", step[1][0], moduleId, digits.IndexOf(Bomb.GetSerialNumber()[4]), digits.IndexOf(Bomb.GetSerialNumber()[5]), digits.IndexOf(Bomb.GetSerialNumber()[4]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[5]));
                     for (int i = 1; i < 5; i++)
                     {
                         Debug.LogFormat("[Simon Stores #{1}] b{2} = {0}", funcseq[1][i], moduleId, i);
@@ -912,7 +949,7 @@ public class SimonStoresScript : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogFormat("[Simon Stores #{1}] c0 = {0}", step[2][0], moduleId);
+                    Debug.LogFormat("[Simon Stores #{1}] c0 = {2}*36 + {3} = {4} \u2248 {0}", step[2][0], moduleId, digits.IndexOf(Bomb.GetSerialNumber()[0]), digits.IndexOf(Bomb.GetSerialNumber()[1]), digits.IndexOf(Bomb.GetSerialNumber()[0]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[1]));
                     for (int i = 1; i < 6; i++)
                     {
                         Debug.LogFormat("[Simon Stores #{1}] c{2} = {0}", funcseq[2][i], moduleId, i);
@@ -1103,15 +1140,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x += D;
-                funcseq[0][j] = "R(" + v + ") = " + v + " + " + D + " = " + x;
+                funcseq[0][j] = "R(" + v + ") = " + v + " + " + D + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += step[0][j - 1] + (int)Math.Pow(j,2);
-                funcseq[1][j] = "R(" + v + ") = " + v + " + " + step[0][j - 1] + " + " + (int)Math.Pow(j,2) + " = " + x;
+                funcseq[1][j] = "R(" + v + ") = " + v + " + " + step[0][j - 1] + " + " + (int)Math.Pow(j,2) + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += step[1][j - 1] - step[0][j - 1];
-                funcseq[2][j] = "R(" + v + ") = " + v + " + " + step[1][j - 1] + " - " + step[0][j - 1] + " = " + x;
+                funcseq[2][j] = "R(" + v + ") = " + v + " + " + step[1][j - 1] + " - " + step[0][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1125,15 +1162,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x -= D;
-                funcseq[0][j] = "G(" + v + ") = " + v + " - " + D + " = " + x;
+                funcseq[0][j] = "G(" + v + ") = " + v + " - " + D + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x = (2 * x) - step[0][j - 1];
-                funcseq[1][j] = "G(" + v + ") = " + "2*" + v + " - " + step[0][j - 1] + " = " + x;
+                funcseq[1][j] = "G(" + v + ") = " + "2*" + v + " - " + step[0][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x -= 2 * step[1][j - 1];
-                funcseq[2][j] = "G(" + v + ") = " + v + " - " + "2*" + step[1][j - 1] + " = " + x;
+                funcseq[2][j] = "G(" + v + ") = " + v + " - " + "2*" + step[1][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1147,15 +1184,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x = (2 * x) - D;
-                funcseq[0][j] = "B(" + v + ") = " + "2*" + v + " - " + D + " = " + x;
+                funcseq[0][j] = "B(" + v + ") = " + "2*" + v + " - " + D + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x = (2 * x) - step[0][0] - (4 * (int)Math.Pow(j, 2));
-                funcseq[1][j] = "B(" + v + ") = " + "2*" + v + " - " + step[0][0] + " - " + 4 * (int)Math.Pow(j, 2) + " = " + x;
+                funcseq[1][j] = "B(" + v + ") = " + "2*" + v + " - " + step[0][0] + " - " + 4 * (int)Math.Pow(j, 2) + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += step[1][0] -  step[0][3];
-                funcseq[2][j] = "B(" + v + ") = " + v + " + " + step[1][0] + " - " + step[0][3] + " = " + x;
+                funcseq[2][j] = "B(" + v + ") = " + v + " + " + step[1][0] + " - " + step[0][3] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1169,15 +1206,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x = D - (8 * j) - x;
-                funcseq[0][j] = "C(" + v + ") = " + D + " - " + v + " - " + 8 * j + " = " + x;
+                funcseq[0][j] = "C(" + v + ") = " + D + " - " + v + " - " + 8 * j + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += step[0][1];
-                funcseq[1][j] = "C(" + v + ") = " + v + " + " + step[0][1] + " = " + x;
+                funcseq[1][j] = "C(" + v + ") = " + v + " + " + step[0][1] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += step[0][j - 1] - step[1][j - 1] ;
-                funcseq[2][j] = "C(" + v + ") = " + v + " + " + step[0][j - 1] + " - " + step[1][j - 1] + " = " + x;
+                funcseq[2][j] = "C(" + v + ") = " + v + " + " + step[0][j - 1] + " - " + step[1][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1191,15 +1228,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x = (3 * (int)Math.Pow(j, 3)) - (2 * x);
-                funcseq[0][j] = "M(" + v + ") = " + 3 * (int)Math.Pow(j, 3) + " - " + "2*" + v + " = " + x;
+                funcseq[0][j] = "M(" + v + ") = " + 3 * (int)Math.Pow(j, 3) + " - " + "2*" + v + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += step[0][2] - D;
-                funcseq[1][j] = "M(" + v + ") = " + v + " + " + step[0][2] + " - " + D + " = " + x;
+                funcseq[1][j] = "M(" + v + ") = " + v + " + " + step[0][2] + " - " + D + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x -= 2 * step[0][j - 1];
-                funcseq[2][j] = "M(" + v + ") = " + v + " - " + "2*" + step[0][j - 1] + " = " + x;
+                funcseq[2][j] = "M(" + v + ") = " + v + " - " + "2*" + step[0][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1213,15 +1250,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x += D - (6 * j);
-                funcseq[0][j] = "Y(" + v + ") = " + v + " + " + D + " - " + 6 * j + " = " + x;
+                funcseq[0][j] = "Y(" + v + ") = " + v + " + " + D + " - " + 6 * j + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += step[0][3] - step[0][j - 1];
-                funcseq[1][j] = "Y(" + v + ") = " + v + " + " + step[0][3] + " - " + step[0][j - 1] + " = " + x;
+                funcseq[1][j] = "Y(" + v + ") = " + v + " + " + step[0][3] + " - " + step[0][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += step[1][4] - step[0][0];
-                funcseq[2][j] = "Y(" + v + ") = " + v + " + " + step[1][4] + " - " + step[0][0] + " = " + x;
+                funcseq[2][j] = "Y(" + v + ") = " + v + " + " + step[1][4] + " - " + step[0][0] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1239,8 +1276,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Max(Red(x, 0, j), Green(x, 0, j));
-                funccatch[2] = "RG(" + v + ") = " + "max([" + Red(v, 0, j) + "], " + "[" + Green(v, 0, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RG(" + v + ") = " + "max([" + Red(v, 0, j) + "], " + "[" + Green(v, 0, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Red(v, 1, j);
@@ -1248,8 +1285,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Red(x, 1, j) - Green(x, 1, j));
-                funccatch[2] = "RG(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RG(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Blue(v, 2, j);
@@ -1259,8 +1296,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(step[2][j - 1], 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Blue(x, 2, j) + Blue(step[1][j - 1], 2, j) + Blue(step[0][j - 1], 2, j);
-                funccatch[3] = "RG(" + v + ") = " + "[" + Blue(v, 2, j) + "] + [" + Blue(step[1][j - 1], 2, j) + "] + [" + Blue(step[0][j - 1], 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RG(" + v + ") = " + "[" + Blue(v, 2, j) + "] + [" + Blue(step[1][j - 1], 2, j) + "] + [" + Blue(step[0][j - 1], 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " +funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1278,8 +1315,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Max(Red(x, 0, j), Blue(x, 0, j));
-                funccatch[2] = "RB(" + v + ") = " + "max([" + Red(v,0,j) + "], " + "[" + Blue(v,0,j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RB(" + v + ") = " + "max([" + Red(v,0,j) + "], " + "[" + Blue(v,0,j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Red(v, 1, j);
@@ -1287,8 +1324,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Red(x, 1, j) - Blue(x, 1, j));
-                funccatch[2] = "RB(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RB(" + v + ") = " + "abs([" + Red(v, 1, j) + "] - [" + Green(v, 1, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Green(v, 2, j);
@@ -1298,8 +1335,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(step[2][j - 1], 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Green(x, 2, j) + Green(step[1][j - 1], 2, j) + Green(step[0][j - 1], 2, j);
-                funccatch[3] = "RB(" + v + ") = " + "[" + Green(v, 2, j) + "] + [" + Green(step[1][j - 1], 2, j) + "] + [" + Green(step[0][j - 1], 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RB(" + v + ") = " + "[" + Green(v, 2, j) + "] + [" + Green(step[1][j - 1], 2, j) + "] + [" + Green(step[0][j - 1], 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1317,8 +1354,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Cyan(x, 0, j) - (2 * D);
-                funccatch[2] = "RC(" + v + ") = [" + Red(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RC(" + v + ") = [" + Red(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Red(v, 1, j);
@@ -1326,8 +1363,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Cyan(x, 1, j)));
-                funccatch[2] = "RC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Red(v, 1, j);
@@ -1335,8 +1372,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Red(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Cyan(x, 2, j))));
-                funccatch[2] = "RC(" + v + ") = min([" + Red(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RC(" + v + ") = min([" + Red(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1354,8 +1391,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Magenta(x, 0, j) - (2 * D);
-                funccatch[2] = "RM(" + v + ") = [" + Red(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RM(" + v + ") = [" + Red(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Red(v, 1, j);
@@ -1363,8 +1400,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Magenta(x, 1, j)));
-                funccatch[2] = "RM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Red(v, 2, j);
@@ -1372,8 +1409,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Red(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Magenta(x, 2, j))));
-                funccatch[2] = "RM(" + v + ") = min([" + Red(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RM(" + v + ") = min([" + Red(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1391,8 +1428,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Red(x, 0, j) + Yellow(x, 0, j) - (2 * D);
-                funccatch[2] = "RY(" + v + ") = [" + Red(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RY(" + v + ") = [" + Red(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Red(v, 1, j);
@@ -1400,8 +1437,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Red(x, 1, j) - Yellow(x, 1, j)));
-                funccatch[2] = "RY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Red(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Red(v, 2, j);
@@ -1409,8 +1446,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Red(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Yellow(x, 2, j))));
-                funccatch[2] = "RY(" + v + ") = min([" + Red(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "RY(" + v + ") = min([" + Red(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1428,8 +1465,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Max(Green(x, 0, j), Blue(x, 0, j));
-                funccatch[2] = "GB(" + v + ") = " + "max([" + Green(v, 0, j) + "], " + "[" + Blue(v, 0, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GB(" + v + ") = " + "max([" + Green(v, 0, j) + "], " + "[" + Blue(v, 0, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Green(v, 1, j);
@@ -1437,8 +1474,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Abs(Green(x, 1, j) - Blue(x, 1, j));
-                funccatch[2] = "GB(" + v + ") = " + "abs([" + Green(v, 1, j) + "] - [" + Blue(v, 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GB(" + v + ") = " + "abs([" + Green(v, 1, j) + "] - [" + Blue(v, 1, j) + "]) = " + x + " \u2248 "+ x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Red(v, 2, j);
@@ -1448,8 +1485,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(step[2][j - 1], 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Red(x, 2, j) + Red(step[1][j - 1], 2, j) + Red(step[0][j - 1], 2, j);
-                funccatch[3] = "GB(" + v + ") = " + "[" + Red(v, 2, j) + "] + [" + Red(step[1][j - 1], 2, j) + "] + [" + Red(step[0][j - 1], 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GB(" + v + ") = " + "[" + Red(v, 2, j) + "] + [" + Red(step[1][j - 1], 2, j) + "] + [" + Red(step[0][j - 1], 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1467,8 +1504,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Green(x, 0, j) + Cyan(x, 0, j) - (2 * D);
-                funccatch[2] = "GC(" + v + ") = [" + Green(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GC(" + v + ") = [" + Green(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Green(v, 1, j);
@@ -1476,8 +1513,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Cyan(x, 1, j)));
-                funccatch[2] = "GC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Green(v, 1, j);
@@ -1485,7 +1522,7 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Green(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Cyan(x, 2, j))));
-                funccatch[2] = "GC(" + v + ") = min([" + Green(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
+                funccatch[2] = "GC(" + v + ") = min([" + Green(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
                 funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
@@ -1504,8 +1541,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Green(x, 0, j) + Magenta(x, 0, j) - (2 * D);
-                funccatch[2] = "GM(" + v + ") = [" + Green(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GM(" + v + ") = [" + Green(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Green(v, 1, j);
@@ -1513,8 +1550,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Magenta(x, 1, j)));
-                funccatch[2] = "GM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Green(v, 2, j);
@@ -1522,8 +1559,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Green(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Magenta(x, 2, j))));
-                funccatch[2] = "GM(" + v + ") = min([" + Green(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GM(" + v + ") = min([" + Green(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1541,8 +1578,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Green(x, 0, j) + Yellow(x, 0, j) - (2 * D);
-                funccatch[2] = "GY(" + v + ") = [" + Green(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GY(" + v + ") = [" + Green(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Green(v, 1, j);
@@ -1550,8 +1587,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Green(x, 1, j) - Yellow(x, 1, j)));
-                funccatch[2] = "GY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Green(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Green(v, 2, j);
@@ -1559,8 +1596,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Green(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Yellow(x, 2, j))));
-                funccatch[2] = "GY(" + v + ") = min([" + Green(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "GY(" + v + ") = min([" + Green(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1578,8 +1615,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Cyan(x, 0, j) - (2 * D);
-                funccatch[2] = "BC(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BC(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Cyan(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Blue(v, 1, j);
@@ -1587,8 +1624,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Cyan(x, 1, j)));
-                funccatch[2] = "BC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BC(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Cyan(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Blue(v, 1, j);
@@ -1596,8 +1633,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, 1, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Cyan(x, 2, j))));
-                funccatch[2] = "BC(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BC(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1615,8 +1652,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Magenta(x, 0, j) - (2 * D);
-                funccatch[2] = "BM(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BM(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Magenta(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Blue(v, 1, j);
@@ -1624,8 +1661,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Magenta(x, 1, j)));
-                funccatch[2] = "BM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BM(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Magenta(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Blue(v, 2, j);
@@ -1633,7 +1670,7 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Blue(x, 2, j), Magenta(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Magenta(x, 2, j))));
-                funccatch[2] = "BM(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x;
+                funccatch[2] = "BM(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Magenta(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Magenta(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
                 funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
                 break;
         }
@@ -1652,8 +1689,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Blue(x, 0, j) + Yellow(x, 0, j) - (2 * D);
-                funccatch[2] = "BY(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BY(" + v + ") = [" + Blue(v, 0, j) + "] + [" + Yellow(v, 0, j) + "] - 2*" + D + " = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Blue(v, 1, j);
@@ -1661,8 +1698,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = (4 * D) - Check(Math.Abs(Blue(x, 1, j) - Yellow(x, 1, j)));
-                funccatch[2] = "BY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BY(" + v + ") = " + 4 * D + " - [abs(" + "[" + Blue(v, 1, j) + "] - [" + Yellow(v, 1, j) + "])] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Blue(v, 2, j);
@@ -1670,8 +1707,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Blue(x, 2, j), Yellow(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Yellow(x, 2, j))));
-                funccatch[2] = "BY(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x;
-                funcseq[2][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "BY(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Yellow(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Yellow(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
         }
         x = Check(x);
@@ -1689,8 +1726,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Min(Cyan(x, 0, j), Magenta(x, 0, j));
-                funccatch[2] = "CM(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Magenta(v, 0, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "CM(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Magenta(v, 0, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Yellow(v, 1, j);
@@ -1698,8 +1735,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Max(Yellow(x, 1, j), Yellow(step[0][j - 1], 1, j));
-                funccatch[2] = "CM(" + v + ") = " + "max([" + Yellow(v, 1, j) + "], " + "[" + Yellow(step[1][j - 1], 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "CM(" + v + ") = " + "max([" + Yellow(v, 1, j) + "], " + "[" + Yellow(step[0][j - 1], 1, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Yellow(v, 2, j);
@@ -1709,8 +1746,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Yellow(x, 2, j) - Magenta(x, 2, j) - Cyan(x, 2, j);
-                funccatch[3] = "CM(" + v + ") = [" + Yellow(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "CM(" + v + ") = [" + Yellow(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1728,8 +1765,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Min(Cyan(x, 0, j), Yellow(x, 0, j));
-                funccatch[2] = "CY(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "CY(" + v + ") = " + "min([" + Cyan(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Magenta(v, 1, j);
@@ -1737,8 +1774,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Max(Magenta(x, 1, j), Magenta(step[0][j - 1], 1, j));
-                funccatch[2] = "CY(" + v + ") = " + "max([" + Magenta(v, 1, j) + "], " + "[" + Magenta(step[1][j - 1], 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "CY(" + v + ") = " + "max([" + Magenta(v, 1, j) + "], " + "[" + Magenta(step[0][j - 1], 1, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Magenta(v, 2, j);
@@ -1748,8 +1785,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Magenta(x, 2, j) - Cyan(x, 2, j) - Yellow(x, 2, j);
-                funccatch[3] = "CY(" + v + ") = [" + Magenta(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "CY(" + v + ") = [" + Magenta(v, 2, j) + "] - [" + Cyan(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1767,8 +1804,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 0, j);
                 funccatch[1] = funcseq[0][j];
                 x = Math.Min(Magenta(x, 0, j), Yellow(x, 0, j));
-                funccatch[2] = "MY(" + v + ") = " + "min([" + Magenta(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "MY(" + v + ") = " + "min([" + Magenta(v, 0, j) + "], " + "[" + Yellow(v, 0, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 1:
                 Cyan(v, 1, j);
@@ -1776,8 +1813,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], 1, j);
                 funccatch[1] = funcseq[1][j];
                 x = Math.Max(Cyan(x, 1, j), Cyan(step[0][j - 1], 1, j));
-                funccatch[2] = "MY(" + v + ") = " + "max([" + Cyan(v, 1, j) + "], " + "[" + Cyan(step[1][j - 1], 1, j) + "]) = " + x;
-                funcseq[1][j] = funccatch[2] + "\n" + funccatch[0] + "\n" + funccatch[1];
+                funccatch[2] = "MY(" + v + ") = " + "max([" + Cyan(v, 1, j) + "], " + "[" + Cyan(step[0][j - 1], 1, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
                 Cyan(v, 2, j);
@@ -1787,8 +1824,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, 2, j);
                 funccatch[2] = funcseq[2][j];
                 x = Cyan(x, 2, j) - Magenta(x, 2, j) - Yellow(x, 2, j);
-                funccatch[3] = "MY(" + v + ") = [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x;
-                funcseq[2][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "MY(" + v + ") = [" + Cyan(v, 2, j) + "] - [" + Magenta(v, 2, j) + "] - [" + Yellow(v, 2, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
         }
         x = Check(x);
@@ -1802,15 +1839,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x += step[0][0];
-                funcseq[0][j] = "RGB(" + v + ") = " + v + " + " + step[0][0] + " = " + x;
+                funcseq[0][j] = "RGB(" + v + ") = " + v + " + " + step[0][0] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += (((x + 400) % 4) * step[1][0]) - step[0][3];
-                funcseq[1][j] = "RGB(" + v + ") = " + v + " + (" + v % 4 + ")*" + step[1][0] + " - " + step[0][3] + " = " + x;
+                funcseq[1][j] = "RGB(" + v + ") = " + v + " + (" + v % 4 + ")*" + step[1][0] + " - " + step[0][3] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += (((x + 600) % 3) * step[2][0]) - (((step[1][j - 1] + 600) % 3) * step[1][0]) + (((step[0][j - 1] + 600) % 3) * step[0][0]);
-                funcseq[2][j] = "RGB(" + v + ") = " + v + " + (" + v % 3 + ")*" + step[2][0] + " - " + "(" + step[1][j - 1] % 3 + ")*" + step[1][0] + "(" + step[0][j - 1] % 3 + ")*" + step[0][0] + " = " + x;
+                funcseq[2][j] = "RGB(" + v + ") = " + v + " + (" + v % 3 + ")*" + step[2][0] + " - " + "(" + step[1][j - 1] % 3 + ")*" + step[1][0] + "(" + step[0][j - 1] % 3 + ")*" + step[0][0] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
@@ -1830,8 +1867,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x,i,j),Green(x,i,j),Cyan(x,i,j));
-                funccatch[3] = "RGC(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGC(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -1841,8 +1878,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x,i,j) + Green(x,i,j) - Cyan(step[0][j - 1],i,j);
-                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -1854,8 +1891,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x,i,j) + Green(x,i,j) - Cyan(step[1][j - 1],i,j) - Cyan(step[0][j - 1],i,j);
-                funccatch[4] = "RGC(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RGC(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1875,8 +1912,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Green(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "RGM(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGM(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -1886,8 +1923,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Green(x, i, j) - Magenta(step[0][j - 1], i, j);
-                funccatch[3] = "RGM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -1899,8 +1936,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Green(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
-                funccatch[4] = "RGM(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RGM(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1920,8 +1957,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Green(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "RGY(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGY(" + v + ") = max([" + Red(v, i, j) + "], [" + Green(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -1931,8 +1968,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Green(x, i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RGC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -1944,8 +1981,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Green(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[4] = "RGY(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RGY(" + v + ") = [" + Red(v, i, j) + "] + [" + Green(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -1965,8 +2002,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Cyan(x, i, j));
-                funccatch[3] = "RBC(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBC(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -1976,8 +2013,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Cyan(step[0][j - 1], i, j);
-                funccatch[3] = "RBC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBC(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -1989,8 +2026,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Cyan(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
-                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2010,8 +2047,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "RBM(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBM(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -2021,8 +2058,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Magenta(step[0][j - 1], i, j);
-                funccatch[3] = "RBM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBM(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -2034,8 +2071,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
-                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RBC(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2055,8 +2092,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Red(x, i, j), Blue(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "RBY(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBY(" + v + ") = max([" + Red(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Red(v, i, j);
@@ -2066,8 +2103,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Red(x, i, j) + Blue(x, i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[3] = "RBY(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RBY(" + v + ") = " + v + " + [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Red(v, i, j);
@@ -2079,8 +2116,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Red(x, i, j) + Blue(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[4] = "RBY(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RBY(" + v + ") = [" + Red(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2100,8 +2137,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Red(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "RCM(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RCM(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2111,8 +2148,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Red(x, i, j);
-                funccatch[3] = "RCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2124,8 +2161,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
-                funccatch[4] = "RCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2145,8 +2182,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Red(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "RCY(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RCY(" + v + ") = min([" + Red(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2156,8 +2193,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Red(x, i, j);
-                funccatch[3] = "RCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2169,8 +2206,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
-                funccatch[4] = "RCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2190,8 +2227,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Red(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "RMY(" + v + ") = min([" + Red(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RMY(" + v + ") = min([" + Red(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Magenta(step[0][j - 1], i, j);
@@ -2201,8 +2238,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Red(x, i, j);
-                funccatch[3] = "RMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "RMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Red(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Magenta(v, i, j);
@@ -2214,8 +2251,8 @@ public class SimonStoresScript : MonoBehaviour
                 Red(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Magenta(x, i, j) + Yellow(x, i, j) - Red(step[1][j - 1], i, j) - Red(step[0][j - 1], i, j);
-                funccatch[4] = "RMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "RMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Red(step[1][j - 1], i, j) + "] - [" + Red(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2235,8 +2272,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Cyan(x, i, j));
-                funccatch[3] = "GBC(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBC(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Green(v, i, j);
@@ -2246,8 +2283,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Cyan(step[0][j - 1], i, j);
-                funccatch[3] = "GBC(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBC(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Green(v, i, j);
@@ -2259,8 +2296,8 @@ public class SimonStoresScript : MonoBehaviour
                 Cyan(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Green(x, i, j) + Blue(x, i, j) - Cyan(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
-                funccatch[4] = "GBC(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "GBC(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Cyan(step[1][j - 1], i, j) + "] - [" + Cyan(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2280,8 +2317,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "GBM(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBM(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Green(v, i, j);
@@ -2291,8 +2328,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Magenta(step[0][j - 1], i, j);
-                funccatch[3] = "GBM(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBM(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Green(v, i, j);
@@ -2303,9 +2340,9 @@ public class SimonStoresScript : MonoBehaviour
                 funccatch[2] = funcseq[2][j];
                 Magenta(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
-                x = Green(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Cyan(step[0][j - 1], i, j);
-                funccatch[4] = "GBM(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                x = Green(x, i, j) + Blue(x, i, j) - Magenta(step[1][j - 1], i, j) - Magenta(step[0][j - 1], i, j);
+                funccatch[4] = "GBM(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Magenta(step[1][j - 1], i, j) + "] - [" + Magenta(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2325,8 +2362,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Max(Green(x, i, j), Blue(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "GBY(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBY(" + v + ") = max([" + Green(v, i, j) + "], [" + Blue(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Green(v, i, j);
@@ -2336,8 +2373,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Green(x, i, j) + Blue(x, i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[3] = "GBY(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GBY(" + v + ") = " + v + " + [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Green(v, i, j);
@@ -2349,8 +2386,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Green(x, i, j) + Blue(x, i, j) - Yellow(step[1][j - 1], i, j) - Yellow(step[0][j - 1], i, j);
-                funccatch[4] = "GBY(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "GBY(" + v + ") = [" + Green(v, i, j) + "] + [" + Blue(v, i, j) + "] - [" + Yellow(step[1][j - 1], i, j) + "] - [" + Yellow(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2370,8 +2407,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "GCM(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GCM(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2381,8 +2418,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Green(x, i, j);
-                funccatch[3] = "GCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2394,8 +2431,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
-                funccatch[4] = "GCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "GCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2415,8 +2452,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "GCY(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GCY(" + v + ") = min([" + Green(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2426,8 +2463,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Green(x, i, j);
-                funccatch[3] = "GCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2439,8 +2476,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
-                funccatch[4] = "GCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "GCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2460,8 +2497,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Green(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "GMY(" + v + ") = min([" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GMY(" + v + ") = min([" + Green(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Magenta(step[0][j - 1], i, j);
@@ -2471,8 +2508,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Green(x, i, j);
-                funccatch[3] = "GMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "GMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Green(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Magenta(v, i, j);
@@ -2484,8 +2521,8 @@ public class SimonStoresScript : MonoBehaviour
                 Green(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Magenta(x, i, j) + Yellow(x, i, j) - Green(step[1][j - 1], i, j) - Green(step[0][j - 1], i, j);
-                funccatch[4] = "GMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "GMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Green(step[1][j - 1], i, j) + "] - [" + Green(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2505,8 +2542,8 @@ public class SimonStoresScript : MonoBehaviour
                 Magenta(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Cyan(x, i, j), Magenta(x, i, j));
-                funccatch[3] = "BCM(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BCM(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Magenta(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2516,8 +2553,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Magenta(step[0][j - 1], i, j) - Blue(x, i, j);
-                funccatch[3] = "BCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BCM(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Magenta(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2529,8 +2566,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Magenta(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
-                funccatch[4] = "BCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "BCM(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Magenta(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2550,8 +2587,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Cyan(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "BCY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BCY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Cyan(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Cyan(step[0][j - 1], i, j);
@@ -2561,8 +2598,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Cyan(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Blue(x, i, j);
-                funccatch[3] = "BCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BCY(" + v + ") = " + v + " + [" + Cyan(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Cyan(v, i, j);
@@ -2574,8 +2611,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Cyan(x, i, j) + Yellow(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
-                funccatch[4] = "BCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "BCY(" + v + ") = [" + Cyan(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2595,8 +2632,8 @@ public class SimonStoresScript : MonoBehaviour
                 Yellow(v, i, j);
                 funccatch[2] = funcseq[0][j];
                 x = Mathf.Min(Blue(x, i, j), Magenta(x, i, j), Yellow(x, i, j));
-                funccatch[3] = "BMY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x;
-                funcseq[0][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BMY(" + v + ") = min([" + Blue(v, i, j) + "], [" + Magenta(v, i, j) + "], [" + Yellow(v, i, j) + "]) = " + x + " \u2248 " + x % 365;
+                funcseq[0][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 1:
                 Magenta(step[0][j - 1], i, j);
@@ -2606,8 +2643,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(v, i, j);
                 funccatch[2] = funcseq[1][j];
                 x += Magenta(step[0][j - 1], i, j) + Yellow(step[0][j - 1], i, j) - Blue(x, i, j);
-                funccatch[3] = "BMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x;
-                funcseq[1][j] = funccatch[3] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2];
+                funccatch[3] = "BMY(" + v + ") = " + v + " + [" + Magenta(step[0][j - 1], i, j) + "] + [" + Yellow(step[0][j - 1], i, j) + "] - [" + Blue(v, i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[1][j] = funccatch[3] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2];
                 break;
             case 2:
                 Magenta(v, i, j);
@@ -2619,8 +2656,8 @@ public class SimonStoresScript : MonoBehaviour
                 Blue(step[0][j - 1], i, j);
                 funccatch[3] = funcseq[2][j];
                 x = Magenta(x, i, j) + Yellow(x, i, j) - Blue(step[1][j - 1], i, j) - Blue(step[0][j - 1], i, j);
-                funccatch[4] = "BMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x;
-                funcseq[2][j] = funccatch[4] + "\n" + funccatch[0] + "\n" + funccatch[1] + "\n" + funccatch[2] + "\n" + funccatch[3];
+                funccatch[4] = "BMY(" + v + ") = [" + Magenta(v, i, j) + "] + [" + Yellow(v, i, j) + "] - [" + Blue(step[1][j - 1], i, j) + "] - [" + Blue(step[0][j - 1], i, j) + "] = " + x + " \u2248 " + x % 365;
+                funcseq[2][j] = funccatch[4] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[3];
                 break;
         }
         x = Check(x);
@@ -2634,15 +2671,15 @@ public class SimonStoresScript : MonoBehaviour
         {
             case 0:
                 x -= step[0][0];
-                funcseq[0][j] = "CMY(" + v + ") = " + v + " - " + step[0][0] + " = " + x;
+                funcseq[0][j] = "CMY(" + v + ") = " + v + " - " + step[0][0] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 1:
                 x += (((step[1][0] + 400) % 4) * x) - step[0][3];
-                funcseq[1][j] = "CMY(" + v + ") = " + v + " + (" + step[1][0] % 4 + ")*" + v + " - " + step[0][3] + " = " + x;
+                funcseq[1][j] = "CMY(" + v + ") = " + v + " + (" + step[1][0] % 4 + ")*" + v + " - " + step[0][3] + " = " + x + " \u2248 " + x % 365;
                 break;
             case 2:
                 x += (((step[2][0] + 600) % 3) * x) - (((step[1][0] + 600) % 3) * step[1][j - 1]) + (((step[0][0] + 600) % 3) * step[0][j - 1]);
-                funcseq[2][j] = "CMY(" + v + ") = " + v + " + (" + step[2][0] % 3 + ")*" + v + " - " + "(" + step[1][0] % 3 + ")*" + step[1][j - 1] + "(" + step[0][0] % 3 + ")*" + step[0][j - 1] + " = " + x;
+                funcseq[2][j] = "CMY(" + v + ") = " + v + " + (" + step[2][0] % 3 + ")*" + v + " - " + "(" + step[1][0] % 3 + ")*" + step[1][j - 1] + "(" + step[0][0] % 3 + ")*" + step[0][j - 1] + " = " + x + " \u2248 " + x % 365;
                 break;
         }
         x = Check(x);
