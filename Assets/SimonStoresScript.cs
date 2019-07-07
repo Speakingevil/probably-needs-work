@@ -86,7 +86,7 @@ public class SimonStoresScript : MonoBehaviour
         step[1][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[4]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[5]));
         step[2][0] = Check(digits.IndexOf(Bomb.GetSerialNumber()[0]) * 36 + digits.IndexOf(Bomb.GetSerialNumber()[1]));
         Debug.LogFormat("[Simon Stores #{1}] D = {2} + {3} + {4} + {5} + {6} + {7} = {0}", D, moduleId, digits.IndexOf(Bomb.GetSerialNumber()[0]), digits.IndexOf(Bomb.GetSerialNumber()[1]), digits.IndexOf(Bomb.GetSerialNumber()[2]), digits.IndexOf(Bomb.GetSerialNumber()[3]), digits.IndexOf(Bomb.GetSerialNumber()[4]), digits.IndexOf(Bomb.GetSerialNumber()[5]));
-        Debug.LogFormat("[Simon Stores #{1}] a0 = {2}*36 + {3} = {0}", step[0][0], moduleId, digits.IndexOf(Bomb.GetSerialNumber()[2]));
+        Debug.LogFormat("[Simon Stores #{1}] a0 = {2}*36 + {3} = {0}", step[0][0], moduleId, digits.IndexOf(Bomb.GetSerialNumber()[2]), digits.IndexOf(Bomb.GetSerialNumber()[3]));
         sequences[0] = Sequence();
         sequences[1] = Finish();
 
