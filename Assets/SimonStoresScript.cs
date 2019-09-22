@@ -1367,9 +1367,9 @@ public class SimonStoresScript : MonoBehaviour
                 funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
-                Red(v, 1, j);
+                Red(v, 2, j);
                 funccatch[0] = funcseq[2][j];
-                Cyan(v, 1, j);
+                Cyan(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Red(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Red(x, 2, j) - Cyan(x, 2, j))));
                 funccatch[2] = "RC(" + v + ") = min([" + Red(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Red(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
@@ -1517,9 +1517,9 @@ public class SimonStoresScript : MonoBehaviour
                 funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
-                Green(v, 1, j);
+                Green(v, 2, j);
                 funccatch[0] = funcseq[2][j];
-                Cyan(v, 1, j);
+                Cyan(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Green(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Green(x, 2, j) - Cyan(x, 2, j))));
                 funccatch[2] = "GC(" + v + ") = min([" + Green(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Green(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
@@ -1628,9 +1628,9 @@ public class SimonStoresScript : MonoBehaviour
                 funcseq[1][j] = funccatch[2] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[0] + "\n" + "[Simon Stores #" + moduleId + "] " + funccatch[1];
                 break;
             case 2:
-                Blue(v, 1, j);
+                Blue(v, 2, j);
                 funccatch[0] = funcseq[2][j];
-                Cyan(v, 1, j);
+                Cyan(v, 2, j);
                 funccatch[1] = funcseq[2][j];
                 x = Mathf.Min(Blue(x, 2, j), Cyan(x, 2, j), Check(-Math.Abs(Blue(x, 2, j) - Cyan(x, 2, j))));
                 funccatch[2] = "BC(" + v + ") = min([" + Blue(v, 2, j) + "], [" + Cyan(v, 2, j) + "], [-abs(" + "[" + Blue(v, 2, j) + "] - [" + Cyan(v, 2, j) + "])]) = " + x + " \u2248 " + x % 365;
