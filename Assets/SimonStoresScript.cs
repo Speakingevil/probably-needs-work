@@ -2736,6 +2736,8 @@ public class SimonStoresScript : MonoBehaviour
             yield break;
 
         yield return null;
+        yield return "strike";
+        yield return "solve";
         yield return m.Groups[1].Value
             .Select(ch =>
             {
